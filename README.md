@@ -60,7 +60,7 @@ Donations via [Liberapay](https://liberapay.com/ilpianista) or Bitcoin (1Ph3hFEo
 
 ## False Positive
 
-**Please** before reporting false positive check https://security.archlinux.org first. `arch-audit` parses that page and then if that page reports a false positive, `arch-audit` will do too. Get in touch with the Arch Linux Security team via IRC at freenode#archlinux-security. Thanks!
+**Please** before reporting false positive check https://security.archlinux.org first. `arch-audit` parses that page and then if that page reports a false positive, `arch-audit` will do too. Get in touch with the Arch Linux Security team via IRC at #archlinux-security channel on [Libera](https://libera.chat/). Thanks!
 
 ## License
 
