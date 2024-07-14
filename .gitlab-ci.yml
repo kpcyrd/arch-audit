@@ -4,6 +4,7 @@ image: archlinux:latest
 stages:
   - build
   - test
+  - release
 
 variables:
   CARGO_HOME: "${CI_PROJECT_DIR}/.cargo"
@@ -100,3 +101,23 @@ deny:
   script:
     - pacman -Su --needed --noconfirm --cachedir "${PACMAN_CACHE}" cargo-deny
     - cargo deny check
+
+crates_publish:
+  stage: release
+  tags:
+    - secure
+  needs:
+    - build
+    - man
+    - completions
+    - format
+    - clippy
+    - check
+    - test
+    - install
+    - deny
+  dependencies: []
+  rules:
+    - if: '$CARGO_REGISTRY_TOKEN && $CI_COMMIT_TAG && $CI_PROJECT_PATH == "archlinux/arch-audit"'
+  script:
+    - cargo publish
