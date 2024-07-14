@@ -7,7 +7,7 @@ use structopt::StructOpt;
 use anyhow::Result;
 use lazy_static::lazy_static;
 use strum::VariantNames;
-use strum_macros::{EnumString, EnumVariantNames, ToString};
+use strum_macros::{EnumString, VariantNames, Display};
 
 #[derive(Debug, StructOpt)]
 #[structopt(about="A utility like pkg-audit for Arch Linux.", global_settings = &[AppSettings::ColoredHelp, AppSettings::DeriveDisplayOrder])]
@@ -67,7 +67,7 @@ pub enum SubCommand {
     Completions(Completions),
 }
 
-#[derive(Debug, StructOpt, ToString, EnumString, EnumVariantNames)]
+#[derive(Debug, StructOpt, Display, EnumString, VariantNames)]
 #[strum(serialize_all = "lowercase")]
 pub enum Color {
     Auto,
@@ -81,7 +81,7 @@ impl Default for Color {
     }
 }
 
-#[derive(Debug, StructOpt, ToString, EnumString, EnumVariantNames)]
+#[derive(Debug, StructOpt, Display, EnumString, VariantNames)]
 #[strum(serialize_all = "snake_case")]
 pub enum SortBy {
     Severity,
