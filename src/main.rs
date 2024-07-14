@@ -14,7 +14,7 @@ use std::process::exit;
 use std::str;
 
 use alpm::{Alpm, Db, Version};
-use atty::Stream;
+use console::colors_enabled;
 use reqwest::{ClientBuilder, Proxy};
 use std::fs::read_to_string;
 use structopt::StructOpt;
@@ -452,7 +452,7 @@ fn write_with_colours(
     let show_colors = match options.color {
         Color::Always => true,
         Color::Never => false,
-        Color::Auto => t.supports_color() && atty::is(Stream::Stdout),
+        Color::Auto => t.supports_color() && colors_enabled(),
     };
 
     if show_colors {

@@ -16,7 +16,6 @@ name = "arch-audit"
 [dependencies]
 alpm = "^3.0"
 anyhow = "^1.0"
-atty = "^0.2"
 reqwest = { version = "^0.12", default-features = false, features = ["rustls-tls-native-roots", "socks", "gzip", "brotli"] }
 tokio = { version = "^1", features = ["macros", "rt-multi-thread"] }
 env_logger = "^0.11"
@@ -31,6 +30,7 @@ url = "^2.5"
 lazy_static = "^1.5"
 toml = "^0.8"
 dirs-next = "^2.0"
+console = "0.15.8"
 
 [dev-dependencies]
 tempfile = "^3.10"
