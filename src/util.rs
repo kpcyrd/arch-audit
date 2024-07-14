@@ -15,7 +15,7 @@ pub fn cmp_by_upgradable(a: &&Affected, b: &&Affected) -> cmp::Ordering {
     a.fixed.is_some().cmp(&b.fixed.is_some()).reverse()
 }
 
-pub fn sort_affected(affected: &mut Vec<&Affected>, sort_by: &[SortBy]) {
+pub fn sort_affected(affected: &mut [&Affected], sort_by: &[SortBy]) {
     for sort in sort_by.iter().rev() {
         match sort {
             SortBy::Severity => affected.sort_by(cmp_by_severity),

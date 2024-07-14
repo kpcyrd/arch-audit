@@ -1,7 +1,5 @@
 #![deny(clippy::nursery, clippy::cargo)]
-extern crate strum;
-extern crate strum_macros;
-
+#![allow(clippy::multiple_crate_versions)]
 use arch_audit::args::*;
 use arch_audit::config::*;
 use arch_audit::errors::*;
@@ -71,7 +69,7 @@ fn squash_avgs(avgs: &Avgs) -> BTreeMap<&str, Affected> {
             if aff.fixed.as_ref().map(|f| Version::new(f.as_str()))
                 < avg.fixed.as_ref().map(|f| Version::new(f.as_str()))
             {
-                aff.fixed = avg.fixed.clone();
+                aff.fixed.clone_from(&avg.fixed);
             }
 
             aff.kind.dedup()
@@ -196,12 +194,10 @@ fn system_is_affected(db: &Db, pkg: &str, fixed: &Option<String>) -> bool {
         return false;
     };
 
-    if let Some(ref fixed) = fixed {
+    fixed.as_ref().map_or(true, |fixed| {
         info!("Comparing with fixed version {}", fixed);
         pkg.version() < Version::new(fixed.clone())
-    } else {
-        true
-    }
+    })
 }
 
 /// Given a `Status` return if it should be shown based on the status and passed `Options`
@@ -288,13 +284,15 @@ fn print_all_affected(options: &Args, affected: &BTreeMap<&str, Affected>, db: &
         strings: HashMap::new(),
     };
 
-    let mut t = match term::stdout() {
-        Some(x) => x,
-        None => Box::new(TerminfoTerminal::new_with_terminfo(io::stdout(), fake_term))
-            as Box<StdoutTerminal>,
-    };
+    let mut t = term::stdout().map_or_else(
+        || {
+            Box::new(TerminfoTerminal::new_with_terminfo(io::stdout(), fake_term))
+                as Box<StdoutTerminal>
+        },
+        |x| x,
+    );
 
-    let mut affected = affected.values().into_iter().collect::<Vec<&Affected>>();
+    let mut affected = affected.values().collect::<Vec<&Affected>>();
     sort_affected(&mut affected, &options.sort);
 
     for aff in affected {

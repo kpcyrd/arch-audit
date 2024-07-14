@@ -85,7 +85,7 @@ pub enum SortBy {
 }
 
 lazy_static! {
-    static ref SORT_BY_DEFAULT_VALUE: String = vec![SortBy::Severity, SortBy::Pkgname,]
+    static ref SORT_BY_DEFAULT_VALUE: String = [SortBy::Severity, SortBy::Pkgname,]
         .iter()
         .map(|e| e.to_string())
         .collect::<Vec<String>>()
