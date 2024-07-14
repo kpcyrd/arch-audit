@@ -14,10 +14,10 @@ use std::process::exit;
 use std::str;
 
 use alpm::{Alpm, Db, Version};
+use clap::Parser;
 use console::colors_enabled;
 use reqwest::{ClientBuilder, Proxy};
 use std::fs::read_to_string;
-use structopt::StructOpt;
 use term::terminfo::TermInfo;
 use term::{color, Attr};
 use term::{StdoutTerminal, TerminfoTerminal};
@@ -27,7 +27,7 @@ static APP_USER_AGENT: &str = concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_P
 
 #[tokio::main]
 async fn main() {
-    let args = Args::from_args();
+    let args = Args::parse();
 
     env_logger::init();
 
@@ -83,7 +83,7 @@ fn squash_avgs(avgs: &Avgs) -> BTreeMap<&str, Affected> {
 
 async fn run(args: Args) -> Result<()> {
     if let Some(SubCommand::Completions(completions)) = args.subcommand {
-        gen_completions(&completions)?;
+        gen_completions(&completions);
         return Ok(());
     }
 

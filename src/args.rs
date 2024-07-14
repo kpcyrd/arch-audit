@@ -1,73 +1,67 @@
 use std::io::stdout;
 use std::path::PathBuf;
 
-use structopt::clap::{AppSettings, Shell};
-use structopt::StructOpt;
+use clap::CommandFactory;
+use clap::{ArgAction, Args as ClapArgs, Parser, Subcommand, ValueEnum};
+use clap_complete::{generate, Shell};
 
-use anyhow::Result;
 use lazy_static::lazy_static;
-use strum::VariantNames;
-use strum_macros::{EnumString, VariantNames, Display};
+use strum_macros::{Display, EnumString, VariantNames};
 
-#[derive(Debug, StructOpt)]
-#[structopt(about="A utility like pkg-audit for Arch Linux.", global_settings = &[AppSettings::ColoredHelp, AppSettings::DeriveDisplayOrder])]
+#[derive(Parser, Debug)]
+#[command(about="A utility like pkg-audit for Arch Linux.", author, version, long_about = None)]
 pub struct Args {
     /// Show only vulnerable package names and their versions. Set twice to hide the versions as well.
-    #[structopt(long, short = "q", parse(from_occurrences))]
+    #[arg(long, short = 'q', action = ArgAction::Count)]
     pub quiet: u8,
     /// Prints packages that depend on vulnerable packages and are thus potentially vulnerable as well. Set twice to show ALL the packages that requires them.
-    #[structopt(long, short = "r", parse(from_occurrences))]
+    #[arg(long, short = 'r', action = ArgAction::Count)]
     pub recursive: u8,
     /// Show packages which are in the [testing] repos. See https://wiki.archlinux.org/index.php/Official_repositories#Testing_repositories
-    #[structopt(long = "show-testing", short = "t")]
+    #[arg(long = "show-testing", short = 't')]
     pub testing: bool,
     /// Show only packages that have already been fixed
-    #[structopt(long, short = "u", long)]
+    #[arg(long, short = 'u', long)]
     pub upgradable: bool,
     /// Bypass tty detection for colors
-    #[structopt(long, short = "C", default_value = "auto", possible_values=&Color::VARIANTS)]
+    #[arg(long, short = 'C', default_value = "auto")]
     pub color: Color,
     /// Set an alternate database location
-    #[structopt(
-        long,
-        short = "b",
-        parse(from_os_str),
-        default_value = "/var/lib/pacman"
-    )]
+    #[arg(long, short = 'b', default_value = "/var/lib/pacman")]
     pub dbpath: PathBuf,
     /// Specify a format to control the output. Placeholders are %n (pkgname), %c (CVEs), %v (fixed version), %t (type), %s (severity), and %r (required by, only when -r is also used).
-    #[structopt(long, short = "f")]
+    #[arg(long, short = 'f')]
     pub format: Option<String>,
     /// Print json output
-    #[structopt(long)]
+    #[arg(long)]
     pub json: bool,
     /// Specify the URL or file path to the security tracker json data
-    #[structopt(long)]
+    #[arg(long)]
     pub source: Option<String>,
     /// Send requests through a proxy
-    #[structopt(long)]
+    #[arg(long)]
     pub proxy: Option<String>,
     /// Do not use a proxy even if one is configured
-    #[structopt(long)]
+    #[arg(long)]
     pub no_proxy: bool,
     /// Specify how to sort the output
-    #[structopt(long, use_delimiter = true, possible_values = &SortBy::VARIANTS, default_value = &SORT_BY_DEFAULT_VALUE)]
+    #[arg(long, use_value_delimiter = true, default_value = &**SORT_BY_DEFAULT_VALUE)]
     pub sort: Vec<SortBy>,
     /// Print the CVE numbers.
-    #[structopt(long, short = "c")]
+    #[arg(long, short = 'c')]
     pub show_cve: bool,
-    #[structopt(subcommand)]
+    #[command(subcommand)]
     pub subcommand: Option<SubCommand>,
 }
 
-#[derive(Debug, StructOpt)]
+#[derive(Debug, Subcommand)]
 pub enum SubCommand {
     /// Generate shell completions
-    #[structopt(name = "completions")]
+    #[clap(name = "completions")]
     Completions(Completions),
 }
 
-#[derive(Debug, StructOpt, Display, EnumString, VariantNames)]
+#[derive(Debug, Clone, Display, EnumString, VariantNames, ValueEnum)]
 #[strum(serialize_all = "lowercase")]
 pub enum Color {
     Auto,
@@ -81,7 +75,7 @@ impl Default for Color {
     }
 }
 
-#[derive(Debug, StructOpt, Display, EnumString, VariantNames)]
+#[derive(Debug, Clone, Display, EnumString, VariantNames, ValueEnum)]
 #[strum(serialize_all = "snake_case")]
 pub enum SortBy {
     Severity,
@@ -98,13 +92,13 @@ lazy_static! {
         .join(",");
 }
 
-#[derive(Debug, StructOpt)]
+#[derive(Debug, ClapArgs)]
 pub struct Completions {
-    #[structopt(possible_values=&Shell::variants())]
     pub shell: Shell,
 }
 
-pub fn gen_completions(args: &Completions) -> Result<()> {
-    Args::clap().gen_completions_to("arch-audit", args.shell, &mut stdout());
-    Ok(())
+pub fn gen_completions(completions: &Completions) {
+    let mut cmd = Args::command();
+    let bin_name = cmd.get_name().to_string();
+    generate(completions.shell, &mut cmd, &bin_name, &mut stdout());
 }
