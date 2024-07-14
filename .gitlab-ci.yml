@@ -93,9 +93,9 @@ install:
       - destdir
     expire_in: 1 day
 
-audit:
+deny:
   stage: test
   needs: []
   script:
-    - pacman -Syu --needed --noconfirm --cachedir "${PACMAN_CACHE}" cargo-audit
-    - cargo audit
+    - pacman -Syu --needed --noconfirm --cachedir "${PACMAN_CACHE}" cargo-deny
+    - cargo deny check

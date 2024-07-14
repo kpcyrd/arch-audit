@@ -42,6 +42,7 @@ lint:
 	$(CARGO) check
 	find . -name '*.rs' -exec touch {} +
 	$(CARGO) clippy --all -- -D warnings
+	$(CARGO) deny check
 
 docs: man completions
 
