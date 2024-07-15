@@ -18,7 +18,9 @@ cache:
 
 before_script:
   - install -d "${PACMAN_CACHE}"
-  - pacman -Syu --needed --noconfirm --cachedir "${PACMAN_CACHE}" rust gcc pkg-config make scdoc
+  - pacman-key --init
+  - pacman -Sy --noconfirm archlinux-keyring
+  - pacman -Su --needed --noconfirm --cachedir "${PACMAN_CACHE}" rust gcc pkg-config make scdoc
   - rustc --version
   - cargo --version
 
@@ -97,5 +99,5 @@ deny:
   stage: test
   needs: []
   script:
-    - pacman -Syu --needed --noconfirm --cachedir "${PACMAN_CACHE}" cargo-deny
+    - pacman -Su --needed --noconfirm --cachedir "${PACMAN_CACHE}" cargo-deny
     - cargo deny check
