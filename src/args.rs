@@ -1,3 +1,6 @@
+// Do not try to lint cli help text as Rust doc
+#![allow(rustdoc::bare_urls, rustdoc::broken_intra_doc_links)]
+
 use std::io::stdout;
 use std::path::PathBuf;
 
