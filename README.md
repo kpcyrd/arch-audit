@@ -1,8 +1,7 @@
 # arch-audit
 
 [![crats.io](https://img.shields.io/crates/v/arch-audit.svg)](https://crates.io/crates/arch-audit)
-[![Build Status](https://gitlab.com/ilpianista/arch-audit/badges/master/pipeline.svg)](https://gitlab.com/ilpianista/arch-audit/pipelines)
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Filpianista%2Farch-audit.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Filpianista%2Farch-audit?ref=badge_shield)
+[![Build Status](https://gitlab.archlinux.org/archlinux/arch-audit/badges/main/pipeline.svg)](https://gitlab.archlinux.org/archlinux/arch-audit/pipelines)
 
 [pkg-audit](https://www.freebsd.org/cgi/man.cgi?query=pkg-audit&sektion=8)-like utility for [Arch Linux](https://archlinux.org).
 
@@ -22,7 +21,7 @@ After the installation just execute `arch-audit`.
 
 ### Development version from sources
 
-    git clone https://github.com/ilpianista/arch-audit
+    git clone https://gitlab.archlinux.org/archlinux/arch-audit.git
     cd arch-audit
     cargo build
     cargo run
@@ -65,6 +64,3 @@ Donations via [Liberapay](https://liberapay.com/ilpianista) or Bitcoin (1Ph3hFEo
 ## License
 
 MIT
-
-
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Filpianista%2Farch-audit.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Filpianista%2Farch-audit?ref=badge_large)

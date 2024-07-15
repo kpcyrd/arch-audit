@@ -79,7 +79,7 @@ Possible values are: severity, pkgname, upgradable, reverse
 	Read more at _https://wiki.archlinux.org/index.php/Arch_Security_Team_
 
 # BUGS
-	Bugs can be reported on the bug tracker _https://gitlab.com/ilpianista/arch-audit/-/issues_
+	Bugs can be reported on the bug tracker _https://gitlab.archlinux.org/archlinux/arch-audit/-/issues_
 
 # AUTHORS
 	Andrea Scarpino <andrea@archlinux.org>
