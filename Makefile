@@ -7,8 +7,9 @@ DATAROOTDIR ?= ${PREFIX}/share
 MANDIR ?= ${DATAROOTDIR}/man
 SYSTEMDDIR ?= ${PREFIX}/lib/systemd/system
 
-TARBALLDIR ?= target/release/tarball
-TARBALLFORMAT=tar.gz
+PROJECT=arch-audit
+CARGO_TARGET_DIR ?= target
+TARBALLDIR ?= $(CARGO_TARGET_DIR)/release/tarball
 
 RM := rm
 CARGO := cargo
@@ -52,19 +53,19 @@ contrib/man/%.1: contrib/man/%.scd
 	$(SCDOC) < $^ > $@
 
 completions: arch-audit
-	target/$(CARGO_TARGET)/arch-audit completions bash | $(INSTALL) -Dm 644 /dev/stdin target/completion/bash/arch-audit
-	target/$(CARGO_TARGET)/arch-audit completions zsh | $(INSTALL) -Dm 644 /dev/stdin target/completion/zsh/_arch-audit
-	target/$(CARGO_TARGET)/arch-audit completions fish | $(INSTALL) -Dm 644 /dev/stdin target/completion/fish/arch-audit.fish
+	$(CARGO_TARGET_DIR)/$(CARGO_TARGET)/arch-audit completions bash | $(INSTALL) -Dm 644 /dev/stdin $(CARGO_TARGET_DIR)/completion/bash/arch-audit
+	$(CARGO_TARGET_DIR)/$(CARGO_TARGET)/arch-audit completions zsh | $(INSTALL) -Dm 644 /dev/stdin $(CARGO_TARGET_DIR)/completion/zsh/_arch-audit
+	$(CARGO_TARGET_DIR)/$(CARGO_TARGET)/arch-audit completions fish | $(INSTALL) -Dm 644 /dev/stdin $(CARGO_TARGET_DIR)/completion/fish/arch-audit.fish
 
 clean:
 	$(RM) -rf target contrib/man/*.1
 
 install: arch-audit docs
-	$(INSTALL) -Dm 755 target/$(CARGO_TARGET)/arch-audit -t $(DESTDIR)$(BINDIR)
+	$(INSTALL) -Dm 755 $(CARGO_TARGET_DIR)/$(CARGO_TARGET)/arch-audit -t $(DESTDIR)$(BINDIR)
 	$(INSTALL) -Dm 644 contrib/man/*.1 -t $(DESTDIR)$(MANDIR)/man1
-	$(INSTALL) -Dm 644 target/completion/bash/arch-audit -t $(DESTDIR)$(DATAROOTDIR)/bash-completion/completions
-	$(INSTALL) -Dm 644 target/completion/zsh/_arch-audit -t $(DESTDIR)$(DATAROOTDIR)/zsh/site-functions
-	$(INSTALL) -Dm 644 target/completion/fish/arch-audit.fish -t $(DESTDIR)$(DATAROOTDIR)/fish/vendor_completions.d
+	$(INSTALL) -Dm 644 $(CARGO_TARGET_DIR)/completion/bash/arch-audit -t $(DESTDIR)$(DATAROOTDIR)/bash-completion/completions
+	$(INSTALL) -Dm 644 $(CARGO_TARGET_DIR)/completion/zsh/_arch-audit -t $(DESTDIR)$(DATAROOTDIR)/zsh/site-functions
+	$(INSTALL) -Dm 644 $(CARGO_TARGET_DIR)/completion/fish/arch-audit.fish -t $(DESTDIR)$(DATAROOTDIR)/fish/vendor_completions.d
 	$(INSTALL) -Dm 644 contrib/systemd/arch-audit.* -t $(DESTDIR)$(SYSTEMDDIR)
 
 uninstall:
@@ -76,10 +77,17 @@ uninstall:
 
 release: all
 	$(INSTALL) -d $(TARBALLDIR)
-	@read -p 'version> ' TAG && \
-		$(SED) -E "s|^version = .*|version = \"$$TAG\"|" -i Cargo.toml && \
+	@glab --version &>/dev/null
+	@$(GIT) cliff --strip=all --unreleased
+	@$(CARGO) pkgid | $(SED) 's/.*#/current version: /'
+	@read -p 'version> ' VERSION && \
+		$(SED) -E "s|^version = .*|version = \"$$VERSION\"|" -i Cargo.toml && \
 		$(CARGO) build --release && \
-		$(GIT) commit --gpg-sign --message "version: release $$TAG" Cargo.toml Cargo.lock && \
-		$(GIT) tag --sign --message "version: release $$TAG" $$TAG && \
-		$(GIT) archive -o $(TARBALLDIR)/arch-audit-$$TAG.$(TARBALLFORMAT) --format $(TARBALLFORMAT) --prefix=arch-audit-$$TAG/ $$TAG && \
-		$(GPG) --detach-sign $(TARBALLDIR)/arch-audit-$$TAG.$(TARBALLFORMAT)
+		$(GIT) cliff --tag "v$$VERSION" > CHANGELOG.md && \
+		$(GIT) commit --gpg-sign --message "chore(release): version v$$VERSION" Cargo.toml Cargo.lock CHANGELOG.md && \
+		$(GIT) tag --sign --message "Version v$$VERSION" v$$VERSION && \
+		$(GIT) archive --format tar --prefix=$(PROJECT)-v$$VERSION/ v$$VERSION | gzip -cn > $(TARBALLDIR)/$(PROJECT)-v$$VERSION.tar.gz && \
+		$(GPG) --detach-sign $(TARBALLDIR)/$(PROJECT)-v$$VERSION.tar.gz && \
+		$(GPG) --detach-sign --yes $(CARGO_TARGET_DIR)/release/$(PROJECT) && \
+		$(GIT) push --tags origin main && \
+		GITLAB_HOST=gitlab.archlinux.org glab release create v$$VERSION $(TARBALLDIR)/$(PROJECT)-v$$VERSION.tar.gz* $(CARGO_TARGET_DIR)/release/$(PROJECT) $(CARGO_TARGET_DIR)/release/$(PROJECT).sig --notes-file <(git cliff --strip=all --latest)
