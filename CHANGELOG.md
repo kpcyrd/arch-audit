@@ -1,4 +1,6 @@
-## [unreleased]
+# Changelog
+
+## [0.2.0] - 2024-07-23
 
 ### Bug Fixes
 
@@ -18,6 +20,8 @@
 
 - doc: Channel has been moved to Libera
 - lint: Do not try to lint cli help text as Rust doc
+- git: Add CI directories to git ignore
+- make: Add make target to release to gitlab
 - clippy: Make clippy happy like a hippo
 - lint: Replace cargo-audit with cargo-deny
 - deps: Replace deprecated atty with console
@@ -130,4 +134,5 @@
 - Release 0.1.18
 - Release 0.1.19
 - Release 0.1.20
+
 
