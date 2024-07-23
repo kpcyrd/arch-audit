@@ -1,2 +1,4 @@
 target/
 contrib/man/*.1
+/.cargo
+/.pacman
