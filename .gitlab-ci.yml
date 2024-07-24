@@ -102,6 +102,15 @@ deny:
     - pacman -Su --needed --noconfirm --cachedir "${PACMAN_CACHE}" cargo-deny
     - cargo deny check
 
+test-publish:
+  stage: test
+  needs:
+    - build
+  rules:
+    - if: '$CI_COMMIT_TAG == null'
+  script:
+    - cargo publish --dry-run
+
 crates_publish:
   stage: release
   tags:
