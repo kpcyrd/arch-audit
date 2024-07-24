@@ -4,6 +4,7 @@
 use std::io::stdout;
 use std::path::PathBuf;
 
+use clap::builder::styling;
 use clap::CommandFactory;
 use clap::{ArgAction, Args as ClapArgs, Parser, Subcommand, ValueEnum};
 use clap_complete::{generate, Shell};
@@ -12,7 +13,7 @@ use lazy_static::lazy_static;
 use strum_macros::{Display, EnumString, VariantNames};
 
 #[derive(Parser, Debug)]
-#[command(about="A utility like pkg-audit for Arch Linux.", author, version, long_about = None)]
+#[command(about="A utility like pkg-audit for Arch Linux.", author, version, long_about = None, styles=help_style())]
 pub struct Args {
     /// Show only vulnerable package names and their versions. Set twice to hide the versions as well.
     #[arg(long, short = 'q', action = ArgAction::Count)]
@@ -104,4 +105,15 @@ pub fn gen_completions(completions: &Completions) {
     let mut cmd = Args::command();
     let bin_name = cmd.get_name().to_string();
     generate(completions.shell, &mut cmd, &bin_name, &mut stdout());
+}
+
+pub fn help_style() -> clap::builder::Styles {
+    styling::Styles::styled()
+        .usage(styling::AnsiColor::Green.on_default() | styling::Effects::BOLD)
+        .header(styling::AnsiColor::Green.on_default() | styling::Effects::BOLD)
+        .literal(styling::AnsiColor::Cyan.on_default() | styling::Effects::BOLD)
+        .invalid(styling::AnsiColor::Yellow.on_default() | styling::Effects::BOLD)
+        .error(styling::AnsiColor::Red.on_default() | styling::Effects::BOLD)
+        .valid(styling::AnsiColor::Cyan.on_default() | styling::Effects::BOLD)
+        .placeholder(styling::AnsiColor::Cyan.on_default())
 }
