@@ -5,8 +5,7 @@ Type = Package
 Target = *
 
 [Action]
-Depends = curl
-Depends = openssl
+Depends = ca-certificates
 Depends = arch-audit
 When = PostTransaction
 Exec = /usr/bin/arch-audit --color always
