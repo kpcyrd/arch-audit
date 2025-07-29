@@ -14,7 +14,7 @@ edition = "2021"
 name = "arch-audit"
 
 [dependencies]
-alpm = "^3.0"
+alpm = "^4.0"
 anyhow = "^1.0"
 reqwest = { version = "^0.12", default-features = false, features = ["rustls-tls-native-roots", "socks", "gzip", "brotli"] }
 tokio = { version = "^1", features = ["macros", "rt-multi-thread"] }
